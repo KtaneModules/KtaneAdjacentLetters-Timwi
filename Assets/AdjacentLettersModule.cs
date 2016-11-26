@@ -118,11 +118,9 @@ public class AdjacentLettersModule : MonoBehaviour
 
     private void Push(int i)
     {
-        if (_isSolved)
-            return;
-
         Buttons[i].AddInteractionPunch(.1f);
         Audio.PlaySoundAtTransform(_pushed[i] ? "ClickOut" : "ClickIn", Buttons[i].transform);
+
         _pushed[i] = !_pushed[i];
         if (_coroutines[i] == null)
         {
@@ -191,11 +189,12 @@ public class AdjacentLettersModule : MonoBehaviour
 
     private void Submit()
     {
+        SubmitButton.AddInteractionPunch();
+        Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, SubmitButton.transform);
+
         if (_isSolved)
             return;
 
-        SubmitButton.AddInteractionPunch();
-        Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, SubmitButton.transform);
         if (!_submitButtonCoroutineActive)
         {
             _submitButtonCoroutineActive = true;
