@@ -23,6 +23,7 @@ public class AdjacentLettersModule : MonoBehaviour
     private bool[] _pushed;
     private bool _isSolved;
     private IEnumerator[] _coroutines;
+    private bool _submitButtonCoroutineActive = false;
 
     private static string[] _nextTo = new[] {
         "CDEHPQTU",
@@ -171,6 +172,23 @@ public class AdjacentLettersModule : MonoBehaviour
         _coroutines[i] = null;
     }
 
+    private IEnumerator SubmitButtonCoroutine()
+    {
+        var origLocation = SubmitButton.transform.localPosition;
+        for (int j = 0; j <= 2; j++)
+        {
+            SubmitButton.transform.localPosition = new Vector3(origLocation.x, origLocation.y - j / 400f, origLocation.z);
+            yield return null;
+        }
+        yield return new WaitForSeconds(.05f);
+        for (int j = 5; j >= 0; j--)
+        {
+            SubmitButton.transform.localPosition = new Vector3(origLocation.x, origLocation.y - j / 1000f, origLocation.z);
+            yield return null;
+        }
+        _submitButtonCoroutineActive = false;
+    }
+
     private void Submit()
     {
         if (_isSolved)
@@ -178,6 +196,11 @@ public class AdjacentLettersModule : MonoBehaviour
 
         SubmitButton.AddInteractionPunch();
         Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, SubmitButton.transform);
+        if (!_submitButtonCoroutineActive)
+        {
+            _submitButtonCoroutineActive = true;
+            StartCoroutine(SubmitButtonCoroutine());
+        }
 
         var expectation = new bool[15];
         for (int i = 0; i < 15; i++)
