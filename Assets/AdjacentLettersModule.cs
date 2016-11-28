@@ -25,71 +25,71 @@ public class AdjacentLettersModule : MonoBehaviour
     private IEnumerator[] _coroutines;
     private bool _submitButtonCoroutineActive = false;
 
-    private static string[] _nextTo = new[] {
-        "CDEHPQTU",
-        "GLNPRXYZ",
-        "AHILRSWY",
-        "EGKNPVYZ",
-        "DGMNSUWZ",
-        "ABEKPQTZ",
-        "ABCFJMRS",
-        "IJSTVWXZ",
-        "ABKLUVWY",
-        "BIMOPQRY",
-        "GHIJLNRT",
-        "CHIOQUVX",
-        "CFGLRTUZ",
-        "ABFHJQRW",
-        "ADEMSUWX",
-        "ABDHJLQY",
-        "CJLNOTVW",
-        "EFNPTVXZ",
-        "EFKOPQXZ",
-        "ACDFKMOS",
-        "DHKPQSVY",
-        "CEFMNUWY",
-        "BCFGJNOS",
-        "DEGIJKOU",
-        "BHILMRTX",
-        "DGIKMOVX"
+    private static string[] _leftRight = new[] {
+        "GLMOY",
+        "AEFNX",
+        "AOSWY",
+        "KMOUY",
+        "HKUVW",
+        "BCJPT",
+        "CRTXY",
+        "EMRUV",
+        "BHJLP",
+        "AQSWX",
+        "AGHLP",
+        "CEIMT",
+        "IQVWX",
+        "GLSWZ",
+        "LPRVY",
+        "DEHJK",
+        "AEPRZ",
+        "IKQTV",
+        "BDJNZ",
+        "CGHIO",
+        "FMQSZ",
+        "IJQRT",
+        "BFKNX",
+        "BCDFU",
+        "DFGNS",
+        "DNOUZ"
     };
     private static string[] _aboveBelow = new[] {
-        "BGJKLMOZ",
-        "ADEKMOTU",
-        "DFGJNTVX",
-        "BCFHORWX",
-        "AFHLOVXY",
-        "CLNSUWXY",
-        "EHNOQUVX",
-        "ACFGLMOP",
-        "MOPQRTXZ",
-        "AFKLSTUW",
-        "BCDMSVWZ",
-        "AEKMSWYZ",
-        "DHIJKNWY",
-        "CDGIKOPS",
-        "GHILNPQY",
-        "CMNRTVWZ",
-        "BDEFHKRZ",
-        "GHJKQSUY",
-        "AILMRTUV",
-        "BEGIJQRZ",
-        "BEFIJRXZ",
-        "BDGILQST",
-        "DEHIPQUV",
-        "ABCNPRXY",
-        "AFJNPQSV",
-        "CEJPTUWY"
+        "DEQVZ",
+        "DIRTU",
+        "HKQRV",
+        "EFHLT",
+        "NPQST",
+        "MOUXY",
+        "BEJLW",
+        "CDKTW",
+        "KNVWX",
+        "HOPUZ",
+        "EJRYZ",
+        "BDNPR",
+        "ADFRS",
+        "ABJMX",
+        "GKSXZ",
+        "AGMVY",
+        "FHILN",
+        "CEGMS",
+        "CILMU",
+        "AVWYZ",
+        "CHOPY",
+        "FOSUW",
+        "CIJOQ",
+        "AGKNX",
+        "BIJLQ",
+        "BFGPT"
     };
 
     void Start()
     {
-        _pushed = new bool[15];
-        _coroutines = new IEnumerator[15];
+        _pushed = new bool[12];
+        _coroutines = new IEnumerator[12];
         _isSolved = false;
 
-        _letters = Enumerable.Range(0, 26).Select(i => (char) (i + 'A')).ToArray().Shuffle().Take(15).ToArray();
-        Debug.LogFormat("[AdjacentLetters] Letters:{0}", string.Join("", _letters.Select((b, i) => (i % 5 == 0 ? "\n" : "") + b.ToString()).ToArray()));
+        _letters = Enumerable.Range(0, 26).Select(i => (char) (i + 'A')).ToArray().Shuffle().Take(12).ToArray();
+        Debug.LogFormat("[AdjacentLetters] Letters:{0}", string.Join("", _letters.Select((b, i) => (i % 4 == 0 ? "\n" : "") + b.ToString()).ToArray()));
 
         for (int i = 0; i < Buttons.Length; i++)
         {
@@ -201,14 +201,14 @@ public class AdjacentLettersModule : MonoBehaviour
             StartCoroutine(SubmitButtonCoroutine());
         }
 
-        var expectation = new bool[15];
-        for (int i = 0; i < 15; i++)
+        var expectation = new bool[12];
+        for (int i = 0; i < 12; i++)
         {
-            var x = i % 5;
-            var y = i / 5;
-            if ((x > 0 && _nextTo[_letters[i] - 'A'].Contains(_letters[i - 1]) || (x < 4 && _nextTo[_letters[i] - 'A'].Contains(_letters[i + 1]))))
+            var x = i % 4;
+            var y = i / 4;
+            if ((x > 0 && _leftRight[_letters[i] - 'A'].Contains(_letters[i - 1]) || (x < 3 && _leftRight[_letters[i] - 'A'].Contains(_letters[i + 1]))))
                 expectation[i] = true;
-            if ((y > 0 && _aboveBelow[_letters[i] - 'A'].Contains(_letters[i - 5]) || (y < 2 && _aboveBelow[_letters[i] - 'A'].Contains(_letters[i + 5]))))
+            if ((y > 0 && _aboveBelow[_letters[i] - 'A'].Contains(_letters[i - 4]) || (y < 2 && _aboveBelow[_letters[i] - 'A'].Contains(_letters[i + 4]))))
                 expectation[i] = true;
         }
 
@@ -220,8 +220,8 @@ public class AdjacentLettersModule : MonoBehaviour
         else
         {
             Debug.LogFormat("[AdjacentLetters] Submitted:{0}\nExpected: {1}",
-                string.Join(" ", _pushed.Select((b, i) => (i % 5 == 0 ? "\n" : "") + string.Format(b ? "[{0}]" : "{0}", _letters[i])).ToArray()),
-                string.Join(" ", expectation.Select((b, i) => (i % 5 == 0 ? "\n" : "") + string.Format(b ? "[{0}]" : "{0}", _letters[i])).ToArray()));
+                string.Join(" ", _pushed.Select((b, i) => (i % 4 == 0 ? "\n" : "") + string.Format(b ? "[{0}]" : "{0}", _letters[i])).ToArray()),
+                string.Join(" ", expectation.Select((b, i) => (i % 4 == 0 ? "\n" : "") + string.Format(b ? "[{0}]" : "{0}", _letters[i])).ToArray()));
             Module.HandleStrike();
         }
     }
