@@ -212,6 +212,10 @@ public class AdjacentLettersModule : MonoBehaviour
                 expectation[i] = true;
         }
 
+        Debug.LogFormat("[AdjacentLetters] Submitted:{0}\nExpected: {1}",
+            string.Join("", _pushed.Select((b, i) => (i % 4 == 0 ? "\n" : "") + string.Format(b ? "[{0}]" : " {0} ", _letters[i])).ToArray()),
+            string.Join("", expectation.Select((b, i) => (i % 4 == 0 ? "\n" : "") + string.Format(b ? "[{0}]" : " {0} ", _letters[i])).ToArray()));
+
         if (_pushed.SequenceEqual(expectation))
         {
             Module.HandlePass();
@@ -219,9 +223,6 @@ public class AdjacentLettersModule : MonoBehaviour
         }
         else
         {
-            Debug.LogFormat("[AdjacentLetters] Submitted:{0}\nExpected: {1}",
-                string.Join(" ", _pushed.Select((b, i) => (i % 4 == 0 ? "\n" : "") + string.Format(b ? "[{0}]" : "{0}", _letters[i])).ToArray()),
-                string.Join(" ", expectation.Select((b, i) => (i % 4 == 0 ? "\n" : "") + string.Format(b ? "[{0}]" : "{0}", _letters[i])).ToArray()));
             Module.HandleStrike();
         }
     }
