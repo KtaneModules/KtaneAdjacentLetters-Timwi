@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.IO;
 using System.Linq;
 using AdjacentLetters;
 using UnityEngine;
@@ -20,10 +21,14 @@ public class AdjacentLettersModule : MonoBehaviour
     public Material PushedButtonMaterial;
 
     private char[] _letters;
+    private bool[] _expectation;
     private bool[] _pushed;
     private bool _isSolved;
     private IEnumerator[] _coroutines;
     private bool _submitButtonCoroutineActive = false;
+
+    private static int _moduleIdCounter = 1;
+    private int _moduleId;
 
     private static string[] _leftRight = new[] {
         "GJMOY",
@@ -84,12 +89,24 @@ public class AdjacentLettersModule : MonoBehaviour
 
     void Start()
     {
+        _moduleId = _moduleIdCounter++;
         _pushed = new bool[12];
         _coroutines = new IEnumerator[12];
         _isSolved = false;
 
         _letters = Enumerable.Range(0, 26).Select(i => (char) (i + 'A')).ToArray().Shuffle().Take(12).ToArray();
-        Debug.LogFormat("[AdjacentLetters] Letters:{0}", string.Join("", _letters.Select((b, i) => (i % 4 == 0 ? "\n" : "") + b.ToString()).ToArray()));
+        _expectation = new bool[12];
+        for (int i = 0; i < 12; i++)
+        {
+            var x = i % 4;
+            var y = i / 4;
+            if ((x > 0 && _leftRight[_letters[i] - 'A'].Contains(_letters[i - 1]) || (x < 3 && _leftRight[_letters[i] - 'A'].Contains(_letters[i + 1]))))
+                _expectation[i] = true;
+            if ((y > 0 && _aboveBelow[_letters[i] - 'A'].Contains(_letters[i - 4]) || (y < 2 && _aboveBelow[_letters[i] - 'A'].Contains(_letters[i + 4]))))
+                _expectation[i] = true;
+        }
+
+        Debug.LogFormat("[AdjacentLetters #{1}] Solution:{0}", string.Join("", _expectation.Select((b, i) => (i % 4 == 0 ? "\n" : "") + string.Format(b ? "[{0}]" : " {0} ", _letters[i])).ToArray()), _moduleId);
 
         for (int i = 0; i < Buttons.Length; i++)
         {
@@ -201,22 +218,9 @@ public class AdjacentLettersModule : MonoBehaviour
             StartCoroutine(SubmitButtonCoroutine());
         }
 
-        var expectation = new bool[12];
-        for (int i = 0; i < 12; i++)
-        {
-            var x = i % 4;
-            var y = i / 4;
-            if ((x > 0 && _leftRight[_letters[i] - 'A'].Contains(_letters[i - 1]) || (x < 3 && _leftRight[_letters[i] - 'A'].Contains(_letters[i + 1]))))
-                expectation[i] = true;
-            if ((y > 0 && _aboveBelow[_letters[i] - 'A'].Contains(_letters[i - 4]) || (y < 2 && _aboveBelow[_letters[i] - 'A'].Contains(_letters[i + 4]))))
-                expectation[i] = true;
-        }
+        Debug.LogFormat("[AdjacentLetters #{1}] You submitted:{0}", string.Join("", _pushed.Select((b, i) => (i % 4 == 0 ? "\n" : "") + string.Format(b ? "[{0}]" : " {0} ", _letters[i])).ToArray()), _moduleId);
 
-        Debug.LogFormat("[AdjacentLetters] Submitted:{0}\nExpected: {1}",
-            string.Join("", _pushed.Select((b, i) => (i % 4 == 0 ? "\n" : "") + string.Format(b ? "[{0}]" : " {0} ", _letters[i])).ToArray()),
-            string.Join("", expectation.Select((b, i) => (i % 4 == 0 ? "\n" : "") + string.Format(b ? "[{0}]" : " {0} ", _letters[i])).ToArray()));
-
-        if (_pushed.SequenceEqual(expectation))
+        if (_pushed.SequenceEqual(_expectation))
         {
             Module.HandlePass();
             _isSolved = true;
