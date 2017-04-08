@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.IO;
 using System.Linq;
 using AdjacentLetters;
@@ -229,5 +230,23 @@ public class AdjacentLettersModule : MonoBehaviour
         {
             Module.HandleStrike();
         }
+    }
+
+    KMSelectable[] ProcessTwitchCommand(string command)
+    {
+        command = command.ToUpperInvariant().Trim();
+
+        if (command.Equals("submit", StringComparison.OrdinalIgnoreCase))
+            return new[] { SubmitButton };
+
+        if (command.StartsWith("set ", StringComparison.OrdinalIgnoreCase) || command.Equals("set", StringComparison.OrdinalIgnoreCase))
+        {
+            command = command.Substring(3).Replace(" ", "");
+            if (command.Any(ch => !_letters.Contains(ch)))
+                return null;
+            return Buttons.Where((btn, i) => _pushed[i] != command.Contains(_letters[i])).ToArray();
+        }
+
+        return null;
     }
 }
