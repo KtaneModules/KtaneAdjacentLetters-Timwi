@@ -232,6 +232,10 @@ public class AdjacentLettersModule : MonoBehaviour
         }
     }
 
+#pragma warning disable 414
+    private string TwitchHelpMessage = @"Set the letters with “!{0} set DPC INUF”. (This will unset all other letters.) Submit your answer with “!{0} submit”.";
+#pragma warning restore 414
+
     KMSelectable[] ProcessTwitchCommand(string command)
     {
         command = command.ToUpperInvariant().Trim();
