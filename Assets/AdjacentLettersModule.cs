@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.IO;
 using System.Linq;
 using AdjacentLetters;
 using UnityEngine;
@@ -224,6 +223,7 @@ public class AdjacentLettersModule : MonoBehaviour
         if (_pushed.SequenceEqual(_expectation))
         {
             Module.HandlePass();
+            Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.CorrectChime, transform);
             _isSolved = true;
         }
         else
@@ -233,24 +233,23 @@ public class AdjacentLettersModule : MonoBehaviour
     }
 
 #pragma warning disable 414
-    private string TwitchHelpMessage = @"Set the letters with “!{0} set DPC INUF”. (This will unset all other letters.) Submit your answer with “!{0} submit”.";
+    private readonly string TwitchHelpMessage = @"!{0} submit DPC INUF [submit letters to be pushed down; all other letters are brought back up]";
 #pragma warning restore 414
 
-    KMSelectable[] ProcessTwitchCommand(string command)
+    IEnumerator ProcessTwitchCommand(string command)
     {
         command = command.ToUpperInvariant().Trim();
 
-        if (command.Equals("submit", StringComparison.OrdinalIgnoreCase))
-            return new[] { SubmitButton };
+        if (!command.StartsWith("submit ", StringComparison.OrdinalIgnoreCase))
+            yield break;
 
-        if (command.StartsWith("set ", StringComparison.OrdinalIgnoreCase) || command.Equals("set", StringComparison.OrdinalIgnoreCase))
-        {
-            command = command.Substring(3).Replace(" ", "");
-            if (command.Any(ch => !_letters.Contains(ch)))
-                return null;
-            return Buttons.Where((btn, i) => _pushed[i] != command.Contains(_letters[i])).ToArray();
-        }
+        command = command.Substring(7).Replace(" ", "");
+        if (command.Any(ch => !_letters.Contains(ch)))
+            yield break;
 
-        return null;
+        yield return null;
+        yield return Buttons.Where((btn, i) => _pushed[i] != command.Contains(_letters[i]));
+        yield return new WaitForSeconds(.6f);
+        yield return new[] { SubmitButton };
     }
 }
