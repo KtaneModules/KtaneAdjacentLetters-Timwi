@@ -19,6 +19,7 @@ public class AdjacentLettersModule : MonoBehaviour
     public Material FontMaterial;
     public Material UnpushedButtonMaterial;
     public Material PushedButtonMaterial;
+    public GameObject Label;
 
     private char[] _letters;
     private bool[] _expectation;
@@ -30,7 +31,7 @@ public class AdjacentLettersModule : MonoBehaviour
     private static int _moduleIdCounter = 1;
     private int _moduleId;
 
-    private static string[] _leftRight = new[] {
+    private static readonly string[] _leftRight = new[] {
         "GJMOY",
         "IKLRT",
         "BHIJW",
@@ -58,7 +59,7 @@ public class AdjacentLettersModule : MonoBehaviour
         "BCHSU",
         "JNRSY"
     };
-    private static string[] _aboveBelow = new[] {
+    private static readonly string[] _aboveBelow = new[] {
         "HKPRW",
         "CDFYZ",
         "DEMTU",
@@ -110,21 +111,18 @@ public class AdjacentLettersModule : MonoBehaviour
 
         for (int i = 0; i < Buttons.Length; i++)
         {
-            var label = new GameObject { name = "Label" };
-            label.transform.parent = Buttons[i].transform;
-            label.transform.localPosition = new Vector3(0, 0.0401f, 0);
-            label.transform.localEulerAngles = new Vector3(90, 0, 0);
-            label.transform.localScale = new Vector3(.01f, .01f, .01f);
-
-            var t = label.AddComponent<TextMesh>();
-            t.text = _letters[i].ToString();
-            t.anchor = TextAnchor.MiddleCenter;
-            t.alignment = TextAlignment.Center;
-            t.fontSize = 72;
-            t.font = Font;
-            t.color = Color.black;
-
-            t.GetComponent<MeshRenderer>().material = FontMaterial;
+            if (i == 0)
+                Label.GetComponent<TextMesh>().text = _letters[i].ToString();
+            else
+            {
+                var label = Instantiate(Label);
+                label.name = "Label";
+                label.transform.parent = Buttons[i].transform;
+                label.transform.localPosition = new Vector3(0, 0.0401f, 0);
+                label.transform.localEulerAngles = new Vector3(90, 0, 0);
+                label.transform.localScale = new Vector3(.01f, .01f, .01f);
+                label.GetComponent<TextMesh>().text = _letters[i].ToString();
+            }
 
             var j = i;
             Buttons[i].OnInteract += delegate { Push(j); return false; };
