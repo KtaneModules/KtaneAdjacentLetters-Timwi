@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Name: ModConfig
   m_EditorClassIdentifier: 
   id: AdjacentLetters_Rus
-  title: Adjacent Letters (Rus)
+  title: Adjacent Letters (Russian)
   description: 'UP, down, left, right, UP, down, left, right...!
 
 

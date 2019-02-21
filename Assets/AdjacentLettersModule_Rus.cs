@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using AdjacentLetters;
 using UnityEngine;
@@ -117,7 +118,7 @@ public class AdjacentLettersModule_Rus : MonoBehaviour
                 _expectation[i] = true;
         }
 
-        Debug.LogFormat("[AdjacentLetters #{1}] Solution:{0}", string.Join("", _expectation.Select((b, i) => (i % 4 == 0 ? "\n" : "") + string.Format(b ? "[{0}]" : " {0} ", _letters[i])).ToArray()), _moduleId);
+        Debug.LogFormat("[AdjacentLetters (Rus) #{1}] Solution:{0}", string.Join("", _expectation.Select((b, i) => (i % 4 == 0 ? "\n" : "") + string.Format(b ? "[{0}]" : " {0} ", _letters[i])).ToArray()), _moduleId);
 
         for (int i = 0; i < Buttons.Length; i++)
         {
@@ -227,7 +228,7 @@ public class AdjacentLettersModule_Rus : MonoBehaviour
             StartCoroutine(SubmitButtonCoroutine());
         }
 
-        Debug.LogFormat("[AdjacentLetters #{1}] You submitted:{0}", string.Join("", _pushed.Select((b, i) => (i % 4 == 0 ? "\n" : "") + string.Format(b ? "[{0}]" : " {0} ", _letters[i])).ToArray()), _moduleId);
+        Debug.LogFormat("[AdjacentLetters (Rus) #{1}] You submitted:{0}", string.Join("", _pushed.Select((b, i) => (i % 4 == 0 ? "\n" : "") + string.Format(b ? "[{0}]" : " {0} ", _letters[i])).ToArray()), _moduleId);
 
         if (_pushed.SequenceEqual(_expectation))
         {
@@ -242,7 +243,7 @@ public class AdjacentLettersModule_Rus : MonoBehaviour
     }
 
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"!{0} submit DPC INUF [submit letters to be pushed down; all other letters are brought back up]";
+    private readonly string TwitchHelpMessage = @"!{0} submit 4 5 6 7 12 [submit buttons to be pushed down; all other buttons are brought back up]";
 #pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string command)
@@ -252,12 +253,26 @@ public class AdjacentLettersModule_Rus : MonoBehaviour
         if (!command.StartsWith("submit ", StringComparison.OrdinalIgnoreCase))
             yield break;
 
-        command = command.Substring(7).Replace(" ", "");
-        if (command.Any(ch => !_letters.Contains(ch)))
-            yield break;
+		char[] delim = new[] {' '};
+        string[] buttons = command.Substring(7).Split(delim, StringSplitOptions.RemoveEmptyEntries);
+		List<int> ids = new List<int>();
+		for (int i = 0; i < buttons.Count(); i++)
+		{
+			if (buttons[i][0] > '0' && buttons[i][0] <= '9')
+			{
+				if (buttons[i].Length == 1)
+				{
+					ids.Add((int)(buttons[i][0] - '1'));
+				}
+				else if (buttons[i].Length == 2 && buttons[i][0] == '1' && buttons[i][1] >= '0' && buttons[i][1] < '3')
+				{
+					ids.Add((int)(buttons[i][1] - '1') + 10);
+				}
+			}
+		}
 
         yield return null;
-        yield return Buttons.Where((btn, i) => _pushed[i] != command.Contains(_letters[i]));
+        yield return Buttons.Where((btn, i) => _pushed[i] != ids.Contains(i));
         yield return new WaitForSeconds(.6f);
         yield return new[] { SubmitButton };
     }

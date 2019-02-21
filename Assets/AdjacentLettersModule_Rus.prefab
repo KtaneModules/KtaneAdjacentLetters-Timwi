@@ -235,7 +235,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ModuleType: AdjacentLettersModule_Rus
-  ModuleDisplayName: Adjacent Letters (Rus)
+  ModuleDisplayName: Adjacent Letters (Russian)
   RequiresTimerVisibility: 0
 --- !u!114 &11464240
 MonoBehaviour:
@@ -278,19 +278,11 @@ MonoBehaviour:
   - {fileID: 114000010036025850}
   - {fileID: 114000011729403080}
   SubmitButton: {fileID: 114000012234469154}
-  Font: {fileID: 12800000, guid: 6a16bbda7f49eb4408e1a0fd3a40da7d, type: 3}
-  FontMaterial: {fileID: 2100000, guid: 81834d4d4bfefb343a7b8e26214a3392, type: 2}
   UnpushedButtonMaterial: {fileID: 2100000, guid: e1759b423eb44254fbcf31c5cf3b2957,
     type: 2}
   PushedButtonMaterial: {fileID: 2100000, guid: ec57db5bf05c27545bbb17f9698766f3,
     type: 2}
   Label: {fileID: 1499279273943332}
-  _letters: []
-  _expectation: []
-  _pushed: []
-  _isSolved: 0
-  _submitButtonCoroutineActive: 0
-  _moduleId: 0
 --- !u!114 &11489324
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2700,4 +2692,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShaderNames:
-  - GUI/Text Shader
+  - GUI/KT 3D Text
