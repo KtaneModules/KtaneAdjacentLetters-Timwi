@@ -11,12 +11,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 615501dbe4f3fe94fbf4b564abb10237, type: 3}
   m_Name: ModConfig
   m_EditorClassIdentifier: 
-  id: AdjacentLetters_Rus
-  title: Adjacent Letters (Russian)
+  id: AdjacentLetters
+  title: Adjacent Letters
+  author: Lumbud, Timwi, DVD
   description: 'UP, down, left, right, UP, down, left, right...!
 
 
-    Module created by lumbud84, implemented by Timwi, translated by DVD.'
+    Module created by lumbud84, implemented by Timwi.
+
+    Russian version created by DVD.
+
+
+    Manuals English: [url=https://ktane.timwi.de/PDF/Adjacent%20Letters.pdf]PDF[/url]
+    | [url=https://ktane.timwi.de/HTML/Adjacent%20Letters.html]HTML[/url]
+
+
+    Manuals Russian: [url=https://ktane.timwi.de/PDF/Adjacent%20Letters%20translated%20(%D0%A0%D1%83%D1%81%D1%81%D0%BA%D0%B8%D0%B9%20%E2%80%94%20%D0%A1%D0%BC%D0%B5%D0%B6%D0%BD%D1%8B%D0%B5%20%D0%B1%D1%83%D0%BA%D0%B2%D1%8B)%20%D0%BF%D0%B5%D1%80%D0%B5%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D0%BD%D1%8B%D0%B9%20%D0%BC%D0%BE%D0%B4%D1%83%D0%BB%D1%8C.pdf]PDF[/url]
+    | [url=https://ktane.timwi.de/HTML/Adjacent%20Letters%20translated%20(%D0%A0%D1%83%D1%81%D1%81%D0%BA%D0%B8%D0%B9%20%E2%80%94%20%D0%A1%D0%BC%D0%B5%D0%B6%D0%BD%D1%8B%D0%B5%20%D0%B1%D1%83%D0%BA%D0%B2%D1%8B)%20%D0%BF%D0%B5%D1%80%D0%B5%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D0%BD%D1%8B%D0%B9%20%D0%BC%D0%BE%D0%B4%D1%83%D0%BB%D1%8C.html]HTML[/url]'
   version: 1.0
   outputFolder: build
-  previewImage: {fileID: 2800000, guid: bd5c1f4881f57d54481b44e4c8a7779a, type: 3}
+  previewImage: {fileID: 2800000, guid: 086ddb27586d92a44b2304c594a2565c, type: 3}
