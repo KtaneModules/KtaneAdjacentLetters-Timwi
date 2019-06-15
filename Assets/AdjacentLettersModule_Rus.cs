@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using AdjacentLetters;
 using UnityEngine;
 
@@ -139,7 +139,7 @@ public class AdjacentLettersModule_Rus : MonoBehaviour
             Buttons[i].OnInteract += delegate { Push(j); return false; };
             Buttons[i].GetComponent<MeshRenderer>().material = UnpushedButtonMaterial;
         }
-		
+
         SubmitButton.OnInteract += delegate { Submit(); return false; };
     }
 
@@ -243,37 +243,34 @@ public class AdjacentLettersModule_Rus : MonoBehaviour
     }
 
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"!{0} submit 4 5 6 7 12 [submit buttons to be pushed down; all other buttons are brought back up]";
+    private readonly string TwitchHelpMessage = @"!{0} submit 4 5 6 7 12 [submit buttons to be pushed down; all other buttons are brought back up] | !{0} submit АЯЖПШЪ [likewise]";
 #pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string command)
     {
-        command = command.ToUpperInvariant().Trim();
+        Match m;
+        if ((m = Regex.Match(command, @"^\s*submit\s+(\d[\d ,;]*)\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)).Success)
+        {
+            var buttons = m.Groups[1].Value.Split(new[] { ' ', ',', ';' }, StringSplitOptions.RemoveEmptyEntries);
+            if (!buttons.All(val => { int x; return int.TryParse(val, out x); }))
+                yield break;
+            var ids = buttons.Select(val => int.Parse(val)).ToList();
 
-        if (!command.StartsWith("submit ", StringComparison.OrdinalIgnoreCase))
-            yield break;
+            yield return null;
+            yield return Buttons.Where((btn, i) => _pushed[i] != ids.Contains(i));
+            yield return new WaitForSeconds(.6f);
+            yield return new[] { SubmitButton };
+        }
+        if((m = Regex.Match(command, @"^\s*submit\s+([АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдежзийклмнопрстуфхцчшщъыьэюя ]*)\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)).Success)
+        {
+            var letters = m.Groups[1].Value.ToUpperInvariant().Replace(" ", "");
+            if (letters.Any(ch => !_letters.Contains(ch)))
+                yield break;
 
-		char[] delim = new[] {' '};
-        string[] buttons = command.Substring(7).Split(delim, StringSplitOptions.RemoveEmptyEntries);
-		List<int> ids = new List<int>();
-		for (int i = 0; i < buttons.Count(); i++)
-		{
-			if (buttons[i][0] > '0' && buttons[i][0] <= '9')
-			{
-				if (buttons[i].Length == 1)
-				{
-					ids.Add((int)(buttons[i][0] - '1'));
-				}
-				else if (buttons[i].Length == 2 && buttons[i][0] == '1' && buttons[i][1] >= '0' && buttons[i][1] < '3')
-				{
-					ids.Add((int)(buttons[i][1] - '1') + 10);
-				}
-			}
-		}
-
-        yield return null;
-        yield return Buttons.Where((btn, i) => _pushed[i] != ids.Contains(i));
-        yield return new WaitForSeconds(.6f);
-        yield return new[] { SubmitButton };
+            yield return null;
+            yield return Buttons.Where((btn, i) => _pushed[i] != letters.Contains(_letters[i]));
+            yield return new WaitForSeconds(.6f);
+            yield return new[] { SubmitButton };
+        }
     }
 }
