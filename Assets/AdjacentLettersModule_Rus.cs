@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Linq;
 using System.Text.RegularExpressions;
-using AdjacentLetters;
 using UnityEngine;
 
 /// <summary>
@@ -106,7 +105,10 @@ public class AdjacentLettersModule_Rus : MonoBehaviour
         _coroutines = new IEnumerator[12];
         _isSolved = false;
 
+        tryAgain:
         _letters = Enumerable.Range(0, 32).Select(i => (char) (i + 'А')).ToArray().Shuffle().Take(12).ToArray();
+        if (!_letters.Contains('З') || !_letters.Contains('Э'))
+            goto tryAgain;
         _expectation = new bool[12];
         for (int i = 0; i < 12; i++)
         {
@@ -129,9 +131,9 @@ public class AdjacentLettersModule_Rus : MonoBehaviour
                 var label = Instantiate(Label);
                 label.name = "Label";
                 label.transform.parent = Buttons[i].transform;
-                label.transform.localPosition = new Vector3(0, 0.0401f, 0);
-                label.transform.localEulerAngles = new Vector3(90, 0, 0);
-                label.transform.localScale = new Vector3(.01f, .01f, .01f);
+                label.transform.localPosition = Label.transform.localPosition;
+                label.transform.localRotation = Label.transform.localRotation;
+                label.transform.localScale = Label.transform.localScale;
                 label.GetComponent<TextMesh>().text = _letters[i].ToString();
             }
 
@@ -243,26 +245,31 @@ public class AdjacentLettersModule_Rus : MonoBehaviour
     }
 
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"!{0} submit 4 5 6 7 12 [submit buttons to be pushed down; all other buttons are brought back up] | !{0} submit АЯЖПШЪ [likewise]";
+    private readonly string TwitchHelpMessage = @"!{0} submit 4 5 6 7 12 [submit buttons to be pushed down; all other buttons are brought back up] | !{0} submit АЯЖПШЪ [likewise] | !{0} submit! [bring all letters up and submit that]";
+    private static readonly string TwitchLanguageId = "ru";
 #pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string command)
     {
+        Debug.Log(Regex.IsMatch("submit А", @"^\s*submit\s+([А]*)\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant).ToString());
+        Debug.Log(Regex.IsMatch("submit А", @"^\s*submit\s+((?:А|Б)*)\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant).ToString());
         Match m;
         if ((m = Regex.Match(command, @"^\s*submit\s+(\d[\d ,;]*)\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)).Success)
         {
             var buttons = m.Groups[1].Value.Split(new[] { ' ', ',', ';' }, StringSplitOptions.RemoveEmptyEntries);
-            if (!buttons.All(val => { int x; return int.TryParse(val, out x); }))
+            if (!buttons.All(val => { int x; return int.TryParse(val, out x) && x >= 1 && x <= 12; }))
                 yield break;
-            var ids = buttons.Select(val => int.Parse(val)).ToList();
+            var ids = buttons.Select(val => int.Parse(val) - 1).ToList();
 
             yield return null;
             yield return Buttons.Where((btn, i) => _pushed[i] != ids.Contains(i));
             yield return new WaitForSeconds(.6f);
             yield return new[] { SubmitButton };
         }
-        if((m = Regex.Match(command, @"^\s*submit\s+([АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдежзийклмнопрстуфхцчшщъыьэюя ]*)\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)).Success)
+        // Bug in Mono prevents use of [АБВГД...]
+        else if ((m = Regex.Match(command, @"^\s*submit\s+((?:А|Б|В|Г|Д|Е|Ж|З|И|Й|К|Л|М|Н|О|П|Р|С|Т|У|Ф|Х|Ц|Ч|Ш|Щ|Ъ|Ы|Ь|Э|Ю|Я| )*)\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)).Success)
         {
+            Debug.Log("X");
             var letters = m.Groups[1].Value.ToUpperInvariant().Replace(" ", "");
             if (letters.Any(ch => !_letters.Contains(ch)))
                 yield break;
@@ -272,5 +279,30 @@ public class AdjacentLettersModule_Rus : MonoBehaviour
             yield return new WaitForSeconds(.6f);
             yield return new[] { SubmitButton };
         }
+        else if (Regex.IsMatch(command, @"^\s*submit\s*!\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            yield return null;
+            yield return Buttons.Where((btn, i) => _pushed[i]);
+            yield return new WaitForSeconds(.6f);
+            yield return new[] { SubmitButton };
+        }
+        else
+        {
+            Debug.Log("Y");
+        }
+    }
+
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        for (var i = 0; i < 12; i++)
+        {
+            if (_expectation[i] != _pushed[i])
+            {
+                Buttons[i].OnInteract();
+                yield return new WaitForSeconds(.1f);
+            }
+        }
+        yield return new WaitForSeconds(.7f);
+        SubmitButton.OnInteract();
     }
 }

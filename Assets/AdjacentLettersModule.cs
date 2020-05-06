@@ -231,23 +231,39 @@ public class AdjacentLettersModule : MonoBehaviour
     }
 
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"!{0} submit DPC INUF [submit letters to be pushed down; all other letters are brought back up]";
+    private readonly string TwitchHelpMessage = @"!{0} submit DPC INUF [submit letters to be pushed down; all other letters are brought back up] | !{0} submit! [bring all letters up and submit that]";
 #pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string command)
     {
         command = command.ToUpperInvariant().Trim();
 
-        if (!command.StartsWith("submit ", StringComparison.OrdinalIgnoreCase))
+        if (!command.StartsWith("submit ", StringComparison.OrdinalIgnoreCase) && !command.EqualsIgnoreCase("submit!"))
             yield break;
 
-        command = command.Substring(7).Replace(" ", "");
-        if (command.Any(ch => !_letters.Contains(ch)))
+        var letters = command.Substring(7).Replace(" ", "");
+        if (command.EqualsIgnoreCase("submit!"))
+            letters = "";
+        if (letters.Any(ch => !_letters.Contains(ch)))
             yield break;
 
         yield return null;
-        yield return Buttons.Where((btn, i) => _pushed[i] != command.Contains(_letters[i]));
+        yield return Buttons.Where((btn, i) => _pushed[i] != letters.Contains(_letters[i]));
         yield return new WaitForSeconds(.6f);
         yield return new[] { SubmitButton };
+    }
+
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        for (var i = 0; i < 12; i++)
+        {
+            if (_expectation[i] != _pushed[i])
+            {
+                Buttons[i].OnInteract();
+                yield return new WaitForSeconds(.1f);
+            }
+        }
+        yield return new WaitForSeconds(.7f);
+        SubmitButton.OnInteract();
     }
 }
