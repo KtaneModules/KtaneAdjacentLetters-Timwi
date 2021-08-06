@@ -280,6 +280,7 @@ MonoBehaviour:
   - {fileID: 114000010036025850}
   - {fileID: 114000011729403080}
   SubmitButton: {fileID: 114000012234469154}
+  FontMaterial: {fileID: 2100000, guid: 9c682b0c8ade10846ae5abb9fa76c5ff, type: 2}
   UnpushedButtonMaterial: {fileID: 2100000, guid: e1759b423eb44254fbcf31c5cf3b2957,
     type: 2}
   PushedButtonMaterial: {fileID: 2100000, guid: ec57db5bf05c27545bbb17f9698766f3,

@@ -15,7 +15,6 @@ public class AdjacentLettersModule : MonoBehaviour
     public KMAudio Audio;
     public KMSelectable[] Buttons;
     public KMSelectable SubmitButton;
-    public Font Font;
     public Material FontMaterial;
     public Material UnpushedButtonMaterial;
     public Material PushedButtonMaterial;
@@ -94,6 +93,8 @@ public class AdjacentLettersModule : MonoBehaviour
         _pushed = new bool[12];
         _coroutines = new IEnumerator[12];
         _isSolved = false;
+
+        FontMaterial.mainTexture.wrapMode = TextureWrapMode.Clamp;
 
         _letters = Enumerable.Range(0, 26).Select(i => (char) (i + 'A')).ToArray().Shuffle().Take(12).ToArray();
         _expectation = new bool[12];
